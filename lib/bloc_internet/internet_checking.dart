@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:project/bloc_internet/internet_state.dart';
 import 'package:project/Login%20Page/login_page.dart';
 import '../Login Page/login_bloc/loginbloc.dart';
@@ -28,15 +29,16 @@ class AfterIntro extends StatelessWidget {
             if (state is InternetGainedState) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return Builder(
-                      builder: (context) => BlocProvider(
-                        create: (context) => SignInBloc(),
-                        child: LoginPage(),
-                      ),
-                    );
-                  },
+                PageTransition(
+                  duration: Duration(seconds: 1),
+                  type: PageTransitionType
+                      .rightToLeft, // Choose your desired transition type
+                  child: Builder(
+                    builder: (context) => BlocProvider(
+                      create: (context) => SignInBloc(),
+                      child: LoginPage(),
+                    ),
+                  ),
                 ),
               );
             } else if (state is InternetLostState) {
@@ -77,4 +79,3 @@ class AfterIntro extends StatelessWidget {
     );
   }
 }
-

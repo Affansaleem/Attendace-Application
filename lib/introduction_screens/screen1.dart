@@ -3,7 +3,6 @@ import 'package:lottie/lottie.dart';
 
 import '../bloc_internet/internet_checking.dart';
 
-
 class Screen1 extends StatefulWidget {
   const Screen1({super.key});
 
@@ -11,7 +10,7 @@ class Screen1 extends StatefulWidget {
   State<Screen1> createState() => _Screen1State();
 }
 
-class _Screen1State extends State<Screen1> with SingleTickerProviderStateMixin{
+class _Screen1State extends State<Screen1> with SingleTickerProviderStateMixin {
   bool allPointsDisplayed = false;
 
   @override
@@ -27,14 +26,14 @@ class _Screen1State extends State<Screen1> with SingleTickerProviderStateMixin{
             children: [
               // Your company logo
               Expanded(
-                child: Image.asset('assets/images/pioneer_logo_app.png',
+                child: Image.asset(
+                  'assets/images/pioneer_logo_app.png',
                 ),
               ),
 
               // Lottie animation with a fixed size
               Expanded(
                 child: Container(
-
                   child: Lottie.asset(
                     "assets/images/security.json",
                     repeat: false,
@@ -114,7 +113,10 @@ class _Screen1State extends State<Screen1> with SingleTickerProviderStateMixin{
               if (allPointsDisplayed)
                 ElevatedButton(
                   style: const ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(Colors.orange)),
+                    backgroundColor: MaterialStatePropertyAll(
+                      Color(0xFFE26142),
+                    ),
+                  ),
                   onPressed: () {
                     Navigator.pushReplacement(context, MaterialPageRoute(
                       builder: (context) {
@@ -172,7 +174,8 @@ class _FadingCircleState extends State<FadingCircle> {
             ),
           ),
         ),
-        const SizedBox(width: 10.0), // Adjust the spacing between the circle and text
+        const SizedBox(
+            width: 10.0), // Adjust the spacing between the circle and text
         AnimatedOpacity(
           opacity: _opacity,
           duration: const Duration(seconds: 1), // Adjust the duration as needed
@@ -182,4 +185,3 @@ class _FadingCircleState extends State<FadingCircle> {
     );
   }
 }
-

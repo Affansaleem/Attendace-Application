@@ -56,13 +56,12 @@ class _LoginPageState extends State<LoginPage> {
           _passwordController.text,
         );
         setState(() {});
-
         Navigator.pushReplacement(
           context,
           PageTransition(
             child: const EmpMainPage(),
             duration: const Duration(seconds: 1),
-            type: PageTransitionType.fade,
+            type: PageTransitionType.rightToLeft,
           ),
         );
       } else if (_selectedUserType == UserType.admin) {
@@ -77,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
           PageTransition(
             child: const AdminMainPage(),
             duration: const Duration(seconds: 1),
-            type: PageTransitionType.fade,
+            type: PageTransitionType.rightToLeft,
           ),
         );
       }
@@ -252,8 +251,8 @@ class _LoginPageState extends State<LoginPage> {
                                   Image.asset('assets/icons/password.png'),
                                 ),
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter at least 8 characters';
+                                  if (value == null || value.isEmpty || value.length< 7) {
+                                    return 'Please enter at least 7 characters';
                                   }
                                   return null;
                                 },
@@ -320,7 +319,7 @@ class _LoginPageState extends State<LoginPage> {
                                       backgroundColor:
                                       (state is SigninValidState)
                                           ? MaterialStateProperty.all(
-                                          Colors.orange)
+                                          Color(0xFFE26142))
                                           : MaterialStateProperty.all(
                                           Colors.grey),
                                       elevation: MaterialStateProperty.all(3),
@@ -363,7 +362,7 @@ class _LoginPageState extends State<LoginPage> {
                       const Text(
                         "No Internet Connection!",
                         style: TextStyle(
-                          color: Colors.red,
+                          color: Color(0xFFE26142),
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
@@ -390,7 +389,7 @@ class _LoginPageState extends State<LoginPage> {
                       const Text(
                         "No Internet Connection!",
                         style: TextStyle(
-                          color: Colors.red,
+                          color: Color(0xFFE26142),
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),

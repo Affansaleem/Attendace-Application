@@ -81,7 +81,7 @@ class _EmpMainPageState extends State<EmpMainPage> {
       }, builder: (context, state) {
         if (state is InternetGainedState) {
           return Scaffold(
-            backgroundColor: const Color(0xFFFDFCF9),
+            backgroundColor: const Color(0xFFF2D2BD),
             body: Stack(
               children: [
                 buildDrawer(),
