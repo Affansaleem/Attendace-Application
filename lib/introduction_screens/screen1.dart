@@ -35,8 +35,8 @@ class _Screen1State extends State<Screen1> with SingleTickerProviderStateMixin {
               Expanded(
                 child: Container(
                   child: Lottie.asset(
-                    "assets/images/security.json",
-                    repeat: false,
+                    "assets/animations/clock3.json",
+                    repeat: true,
                     onLoaded: (_) {
                       // Animation has loaded, set the flag to true
                       setState(() {

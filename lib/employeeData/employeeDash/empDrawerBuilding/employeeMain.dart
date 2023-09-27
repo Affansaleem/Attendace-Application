@@ -25,8 +25,11 @@ class _EmpMainPageState extends State<EmpMainPage> {
 
   final EmpDashboardkBloc dashBloc = EmpDashboardkBloc();
   Future<void> _logout(BuildContext context) async {
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('Login', false); // Set the login status to false
+
+
 
     Navigator.pushReplacement(
       context,
