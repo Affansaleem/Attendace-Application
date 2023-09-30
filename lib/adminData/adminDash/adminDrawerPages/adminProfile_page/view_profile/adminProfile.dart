@@ -224,7 +224,8 @@ class AdminViewPage extends StatelessWidget {
                   // Handle error state for AdminApiBloc if needed
                   return Text("Admin API Error: ${adminState.message}");
                 }
-              } else if (internetState is InternetLostState) {
+              }
+              else if (internetState is InternetLostState) {
                 // Handle InternetLostState if needed
                 return Scaffold(
                   body: Container(

@@ -3,8 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:project/api_intigration_files/emp_attendane_dash_api_files/emp_attendance_bloc.dart';
+import 'package:project/api_intigration_files/models/emp_attendance_status_model.dart';
+import 'package:project/api_intigration_files/repository/emp_attendance_status_repository.dart';
 import 'package:project/bloc_internet/internet_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../api_intigration_files/emp_dash_api_files/emp_dash_bloc.dart';
+import '../../../../api_intigration_files/models/emp_dash_model.dart';
+import '../../../../api_intigration_files/repository/emp_dash_repository.dart';
 import '../../../../bloc_internet/internet_bloc.dart';
 import '../../empDrawerPages/employeeMap/employeemap.dart';
 
@@ -105,282 +111,337 @@ class _HomePageState extends State<EmpDashHome> {
         DateFormat('EEEE, d MMMM yyyy').format(DateTime.now());
 
     //FIRST APPROACH
-    return BlocConsumer<InternetBloc, InternetStates>(
+    return BlocProvider(
+      create: (context) {
+        return EmpAttendanceBloc(
+          RepositoryProvider.of<EmpAttendanceRepository>(context),
+        )..add(EmpAttendanceLoadingEvent());
+      },
+      child: BlocConsumer<InternetBloc, InternetStates>(
         listener: (context, state) {
-      // TODO: implement listener
-    }, builder: (context, state) {
-      if (state is InternetGainedState) {
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    GridView.count(
-                      shrinkWrap: true,
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              "assets/icons/man.png",
-                              width: 120,
-                              height: 80,
+          // TODO: implement listener
+        },
+        builder: (context, state) {
+          if (state is InternetGainedState) {
+            return BlocProvider(
+              create: (context) {
+                return EmpDashBloc(EmpDashRepository())
+                  ..add(EmpDashLoadingEvent());
+              },
+              child: BlocBuilder<EmpDashBloc, EmpDashState>(
+                builder: (context, empDashState) {
+                  if (empDashState is EmpDashLoadedState) {
+                    // Handle the loaded state here
+                    List<EmpDashModel> userList = empDashState.users;
+                    final employee = userList[0];
+
+                    return BlocBuilder<EmpAttendanceBloc, EmpAttendanceState>(
+                      builder: (context, state) {
+                        if (state is EmpAttendanceLoadedState) {
+                          List<EmpAttendanceModel> userList = state.users;
+                          final employeeAttendance = userList[0];
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 20),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 20),
+                                      GridView.count(
+                                        shrinkWrap: true,
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 20,
+                                        mainAxisSpacing: 20,
+                                        children: [
+                                          Container(
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: ClipOval(
+                                              child: Image.asset(
+                                                "assets/icons/man.png",
+                                                width: 120,
+                                                height: 80,
+                                              ),
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: onTapMaps,
+                                            child: ItemDashboard(
+                                              showShadow: false,
+                                              title: 'Mark Attendance',
+                                              customIcon: Image.asset(
+                                                "assets/icons/locate.png",
+                                                width: 120,
+                                                height: 80,
+                                              ),
+                                              background: const Color(0xFFE26142),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  height: 80,
+                                  child:  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      ProfileInfoCard(
+                                          firstText: "IN", secondText: employeeAttendance.in1 != null ? employeeAttendance.status:"---"),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      ProfileInfoCard(
+                                          firstText: "Status", secondText: employeeAttendance.status != null?employeeAttendance.status:"---"),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      ProfileInfoCard(
+                                          firstText: "OUT",
+                                          secondText: employeeAttendance.out2 != null? employeeAttendance.out2 : "---"),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  'Welcome ${savedCorporateID ?? ''}',
+                                  style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  formattedDate,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Table(
+                                  children: [
+                                    TableRow(
+                                      children: [
+                                        ProfileInfoBigCard(
+                                          firstText:
+                                              employee.presentCount.toString(),
+                                          secondText: "Total Present",
+                                          icon: Image.asset(
+                                            "assets/icons/Attend.png",
+                                            width: 35,
+                                          ),
+                                        ),
+                                        ProfileInfoBigCard(
+                                          firstText:
+                                              employee.absentCount.toString(),
+                                          secondText: "Total Absent",
+                                          icon: Image.asset(
+                                            "assets/icons/absence.png",
+                                            width: 35,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Table(
+                                  children: [
+                                    TableRow(
+                                      children: [
+                                        ProfileInfoBigCard(
+                                          firstText:
+                                              employee.leaveCount.toString(),
+                                          secondText: "Total Leaves",
+                                          icon: Image.asset(
+                                            "assets/icons/leave.png",
+                                            width: 35,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 20),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 20),
+                                      GridView.count(
+                                        shrinkWrap: true,
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 20,
+                                        mainAxisSpacing: 20,
+                                        children: [
+                                          GestureDetector(
+                                            child: ItemDashboard(
+                                              showShadow: false,
+                                              title: 'Leave Request',
+                                              customIcon: Image.asset(
+                                                "assets/icons/leave.png",
+                                                width: 120,
+                                                height: 80,
+                                              ),
+                                              background:
+                                                  const Color(0xFFE26142),
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            child: ItemDashboard(
+                                              showShadow: false,
+                                              title: 'Reports',
+                                              customIcon: Image.asset(
+                                                "assets/icons/report.png",
+                                                width: 120,
+                                                height: 80,
+                                              ),
+                                              background:
+                                                  const Color(0xFFE26142),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Divider(
+                                  height: 1,
+                                  color: Colors.grey,
+                                  thickness: 1,
+                                  indent: 60,
+                                  endIndent: 60,
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Center(
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Contact Us',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      // Adjust the spacing between the lines
+                                      Text(
+                                        'Powered by Pioneer',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w300,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: onTapMaps,
-                          child: ItemDashboard(
-                            showShadow: false,
-                            title: 'Mark Attendance',
-                            customIcon: Image.asset(
-                              "assets/icons/locate.png",
-                              width: 120,
-                              height: 80,
-                            ),
-                            background: Color(0xFFE26142),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                          );
+                        } else if (state is EmpAttendanceLoadingState) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (state is EmpAttendanceErrorState) {
+                          return Text("Error: ${state.message}");
+                        } else {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                      },
+                    );
+                  } else if (empDashState is EmpDashErrorState) {
+                    // Handle the error state here
+                    return Text("Error: ${empDashState.message}");
+                  } else {
+                    // Handle other states or return a loading indicator
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
               ),
-              Container(
-                height: 80,
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    SizedBox(
-                      width: 5,
-                    ),
-                    ProfileInfoCard(firstText: "IN", secondText: "00:00"),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    ProfileInfoCard(firstText: "Status", secondText: "A"),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    ProfileInfoCard(firstText: "OUT", secondText: "00:00"),
-                    SizedBox(
-                      width: 5,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Welcome ${savedCorporateID ?? ''}',
-                style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                formattedDate,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-              Table(
-                children: [
-                  TableRow(
+            );
+          } else if (state is InternetLostState) {
+            return Expanded(
+              child: Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ProfileInfoBigCard(
-                        firstText: "20",
-                        secondText: "Total Present",
-                        icon: Image.asset(
-                          "assets/icons/Attend.png",
-                          width: 35,
+                      const Text(
+                        "No Internet Connection!",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      ProfileInfoBigCard(
-                        firstText: "8",
-                        secondText: "Total Absent",
-                        icon: Image.asset(
-                          "assets/icons/absence.png",
-                          width: 35,
-                        ),
+                      const SizedBox(
+                        height: 20,
                       ),
+                      Lottie.asset('assets/no_wifi.json'),
                     ],
                   ),
-                  TableRow(
-                    children: [
-                      ProfileInfoBigCard(
-                        firstText: "0 - 4 ",
-                        secondText: "Leaves/Holiday",
-                        icon: Image.asset(
-                          "assets/icons/holiday.png",
-                          width: 35,
-                        ),
-                      ),
-                      ProfileInfoBigCard(
-                        firstText: "7",
-                        secondText: "Working Days",
-                        icon: Image.asset(
-                          "assets/icons/business.png",
-                          width: 35,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    GridView.count(
-                      shrinkWrap: true,
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
+            );
+          } else {
+            return Expanded(
+              child: Scaffold(
+                body: Container(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        GestureDetector(
-                          child: ItemDashboard(
-                            showShadow: false,
-                            title: 'Leave Request',
-                            customIcon: Image.asset(
-                              "assets/icons/leave.png",
-                              width: 120,
-                              height: 80,
-                            ),
-                            background: const Color(0xFFE26142),
+                        const Text(
+                          "No Internet Connection!",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        GestureDetector(
-                          child: ItemDashboard(
-                            showShadow: false,
-                            title: 'Reports',
-                            customIcon: Image.asset(
-                              "assets/icons/report.png",
-                              width: 120,
-                              height: 80,
-                            ),
-                            background: const Color(0xFFE26142),
-                          ),
+                        const SizedBox(
+                          height: 20,
                         ),
+                        Lottie.asset('assets/no_wifi.json'),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-              const Divider(
-                height: 1,
-                color: Colors.grey,
-                thickness: 1,
-                indent: 60,
-                endIndent: 60,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Center(
-                child: Column(
-                  children: [
-                    Text(
-                      'Contact Us',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    // Adjust the spacing between the lines
-                    Text(
-                      'Powered by Pioneer',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-            ],
-          ),
-        );
-      } else if (state is InternetLostState) {
-        return Expanded(
-          child: Scaffold(
-            body: Container(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "No Internet Connection!",
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Lottie.asset('assets/no_wifi.json'),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      } else {
-        return Expanded(
-          child: Scaffold(
-            body: Container(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "No Internet Connection!",
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Lottie.asset('assets/no_wifi.json'),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-    });
+            );
+          }
+        },
+      ),
+    );
   }
 }
+
+// ... The rest of your code for ItemDashboard, ProfileInfoCard, TwoLineItem, ProfileInfoBigCard, etc.
 
 class ItemDashboard extends StatelessWidget {
   final String title;

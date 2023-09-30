@@ -1,6 +1,5 @@
 
 import 'package:equatable/equatable.dart';
-import 'package:http/http.dart' as http;
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
@@ -15,6 +14,7 @@ class ApiIntigrationBloc
   final UserRepository _userRepository;
   ApiIntigrationBloc(this._userRepository) : super(ApiLoadingState()) {
     on<ApiLoadingEvent>((event, emit) async {
+      print("ApiLoadingEvent emitted");
       emit(ApiLoadingState());
       try{
         final users=await _userRepository.getData();

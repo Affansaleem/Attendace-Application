@@ -21,7 +21,7 @@ class EmpDashboard extends StatelessWidget {
           openDrawer: openDrawer,
         ),
       ),
-      body: EmpDashHome(),
+      body: const EmpDashHome(),
     );
   }
 }
