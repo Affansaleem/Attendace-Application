@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:project/api_intigration_files/repository/emp_leave_request_repository.dart';
+import 'package:project/api_intigration_files/repository/emp_post_leave_request_repository.dart';
 import 'package:project/api_intigration_files/repository/emp_profile_repository.dart';
 import 'package:project/app_startUp.dart';
 import 'api_intigration_files/api_integration_files/api_intigration_bloc.dart';
@@ -13,6 +16,7 @@ import 'api_intigration_files/repository/admin_repository.dart';
 // ... (imports)
 
 void main() {
+  Fluttertoast.showToast;
   runApp(const MyApp());
 }
 
@@ -21,6 +25,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<UserRepository>(
@@ -32,6 +37,10 @@ class MyApp extends StatelessWidget {
           create: (_) => EmpAttendanceRepository(),
         ),RepositoryProvider<EmpProfileRepository>(
           create: (_) => EmpProfileRepository(),
+        ),RepositoryProvider<EmpLeaveRepository>(
+          create: (_) => EmpLeaveRepository(),
+        ),RepositoryProvider<SubmissionRepository>(
+          create: (_) => SubmissionRepository(),
         ),
         // Add other repository providers if needed
       ],
@@ -48,6 +57,7 @@ class MyApp extends StatelessWidget {
             },
           ),
         ],
+
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',

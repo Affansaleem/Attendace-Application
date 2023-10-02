@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,6 +14,8 @@ import '../../../../api_intigration_files/models/emp_dash_model.dart';
 import '../../../../api_intigration_files/repository/emp_dash_repository.dart';
 import '../../../../bloc_internet/internet_bloc.dart';
 import '../../empDrawerPages/employeeMap/employeemap.dart';
+import '../../emp_home_seprate_files/leave_report_main_page.dart';
+import '../../emp_home_seprate_files/leave_request_seprate_files/leave_request_application_page.dart';
 
 class EmpDashHome extends StatefulWidget {
   const EmpDashHome({Key? key}) : super(key: key);
@@ -304,6 +307,12 @@ class _HomePageState extends State<EmpDashHome> {
                                               background:
                                                   const Color(0xFFE26142),
                                             ),
+                                            onTap: () {
+                                              Navigator.push(context, CupertinoPageRoute(builder: (context) {
+                                                // return LeaveRequestForm();
+                                                return LeaveRequestPage();
+                                              },));
+                                            },
                                           ),
                                           GestureDetector(
                                             child: ItemDashboard(
