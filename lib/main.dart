@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:project/api_intigration_files/repository/LeaveHistory_repository.dart';
 import 'package:project/api_intigration_files/repository/emp_leave_request_repository.dart';
 import 'package:project/api_intigration_files/repository/emp_post_leave_request_repository.dart';
 import 'package:project/api_intigration_files/repository/emp_profile_repository.dart';
@@ -25,7 +26,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<UserRepository>(
@@ -33,14 +33,21 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider<AdminRepository>(
           create: (_) => AdminRepository(),
-        ),RepositoryProvider<EmpAttendanceRepository>(
+        ),
+        RepositoryProvider<EmpAttendanceRepository>(
           create: (_) => EmpAttendanceRepository(),
-        ),RepositoryProvider<EmpProfileRepository>(
+        ),
+        RepositoryProvider<EmpProfileRepository>(
           create: (_) => EmpProfileRepository(),
-        ),RepositoryProvider<EmpLeaveRepository>(
+        ),
+        RepositoryProvider<EmpLeaveRepository>(
           create: (_) => EmpLeaveRepository(),
-        ),RepositoryProvider<SubmissionRepository>(
+        ),
+        RepositoryProvider<SubmissionRepository>(
           create: (_) => SubmissionRepository(),
+        ),
+        RepositoryProvider<LeaveHistoryRepository>(
+          create: (_) => LeaveHistoryRepository(),
         ),
         // Add other repository providers if needed
       ],
@@ -57,7 +64,6 @@ class MyApp extends StatelessWidget {
             },
           ),
         ],
-
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',

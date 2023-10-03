@@ -48,7 +48,7 @@ class _IntroScreenState extends State<IntroScreen> {
                 onPressed: () {
                   // Do something when on the last page
                 },
-                child: Text('Next'),
+                child: const Text('Next'),
               ),
             ),
         ],

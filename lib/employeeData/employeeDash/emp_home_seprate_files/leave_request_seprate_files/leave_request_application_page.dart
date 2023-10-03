@@ -22,7 +22,7 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
   DateTime _toDate = DateTime.now();
   final EmpPostRequestBloc _postRequestBloc = EmpPostRequestBloc(
     submissionRepository:
-        SubmissionRepository(), // Provide your repository here
+    SubmissionRepository(), // Provide your repository here
   );
 
   Future<void> getSharedData() async {
@@ -87,28 +87,30 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
         },
         builder: (context, state) {
           if (state is EmpLeaveRequestLoadingState) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           } else if (state is EmpLeaveRequestLoadedState) {
             int selectedTypeId = 0;
             List<EmpLeaveModel> userList = state.users;
             final employeeLeave1 =
-                userList.isNotEmpty ? userList[0] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
+            userList.isNotEmpty ? userList[0] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
             final employeeLeave2 =
-                userList.length > 1 ? userList[1] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
+            userList.length > 1 ? userList[1] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
             final employeeLeave3 =
-                userList.length > 2 ? userList[2] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
+            userList.length > 2 ? userList[2] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
 
             selectedTypeId = employeeLeave1.leaveTypeId ?? 0;
 
             return Scaffold(
               appBar: AppBar(
-                title: const Text(
+                title: Text(
                   'Leave Request Form',
                   style: TextStyle(
                     color: Colors.white,
                   ),
                 ),
-                iconTheme: const IconThemeData(
+                iconTheme: IconThemeData(
                   color: Colors.white,
                 ),
                 centerTitle: true,
@@ -119,7 +121,7 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'From Date',
                       style: TextStyle(fontSize: 16),
                     ),
@@ -129,7 +131,7 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                           child: TextFormField(
                             readOnly: true,
                             onTap: () => _selectFromDate(context),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: 'Select Date',
                               suffixIcon: Icon(Icons.calendar_today),
                             ),
@@ -140,8 +142,8 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
+                    SizedBox(height: 16),
+                    Text(
                       'To Date',
                       style: TextStyle(fontSize: 16),
                     ),
@@ -151,7 +153,7 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                           child: TextFormField(
                             readOnly: true,
                             onTap: () => _selectToDate(context),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: 'Select Date',
                               suffixIcon: Icon(Icons.calendar_today),
                             ),
@@ -162,23 +164,17 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
+                    SizedBox(height: 16),
+                    Text(
                       'Reason',
                       style: TextStyle(fontSize: 16),
                     ),
                     DropdownButtonFormField<String>(
                       value: _selectedReason,
                       items: [
-                        employeeLeave1.ltypeName != null
-                            ? employeeLeave1.ltypeName
-                            : "---",
-                        employeeLeave2.ltypeName != null
-                            ? employeeLeave2.ltypeName
-                            : "---",
-                        employeeLeave3.ltypeName != null
-                            ? employeeLeave3.ltypeName
-                            : "---",
+                        employeeLeave1.ltypeName,
+                        employeeLeave2.ltypeName,
+                        employeeLeave3.ltypeName,
                       ].map((String reason) {
                         return DropdownMenuItem<String>(
                           value: reason,
@@ -193,14 +189,13 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                         });
                       },
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
+                    SizedBox(height: 16),
+                    Text(
                       'Leave Duration',
                       style: TextStyle(fontSize: 16),
                     ),
                     DropdownButtonFormField<String>(
-                      value:
-                          _selectedLeaveDuration, // Use the selected value variable
+                      value: _selectedLeaveDuration,
                       items: [
                         "Full Day",
                         "Half Day",
@@ -212,39 +207,35 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                       }).toList(),
                       onChanged: (value) {
                         setState(() {
-                          // Update the selected value variable
                           _selectedLeaveDuration = value!;
-                          // Update the controller's text value
                           _leaveDurationController.text =
                               _selectedLeaveDuration;
                         });
                       },
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: () async {
                         final selectedLeaveDuration =
                             _leaveDurationController.text;
-                        final selectedReason = _reasonController
-                            .text; // Capture the selected value
+                        final selectedReason =
+                            _reasonController.text;
                         final selectedTypeId =
                             _reasonToLTypeId[selectedReason] ?? 0;
 
-                        print(
-                            "Selected leave duration: $selectedLeaveDuration");
                         final submissionModel = SubmissionModel(
                           employeeId: empId.toString(),
                           fromDate:
-                              "${_fromDate.toLocal().toIso8601String().split('T')[0]}T00:00:00Z",
+                          "${_fromDate.toLocal().toIso8601String().split('T')[0]}T00:00:00Z",
                           toDate:
-                              "${_toDate.toLocal().toIso8601String().split('T')[0]}T00:00:00Z",
+                          "${_toDate.toLocal().toIso8601String().split('T')[0]}T00:00:00Z",
                           reason: selectedReason,
                           leaveId: selectedTypeId,
                           leaveDuration:
-                              selectedLeaveDuration, // Use the captured value
+                          selectedLeaveDuration,
                           status: 'UnApproved',
                           applicationDate:
-                              "${DateTime.now().toIso8601String().split('T')[0]}T00:00:00Z",
+                          "${DateTime.now().toIso8601String().split('T')[0]}T00:00:00Z",
                           remark: '',
                         );
 
@@ -260,7 +251,7 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                           submissionModel.remark,
                         ));
 
-                        await Future.delayed(Duration(seconds: 2));
+                        await Future.delayed(const Duration(seconds: 2));
 
                         if (_postRequestBloc.state is SubmissionSuccess) {
                           Fluttertoast.showToast(
@@ -269,11 +260,11 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                         } else if (_postRequestBloc.state is SubmissionError) {
                           Fluttertoast.showToast(
                             msg:
-                                "Error: ${(_postRequestBloc.state as SubmissionError).error}",
+                            "Error: ${(_postRequestBloc.state as SubmissionError).error}",
                           );
                         }
                       },
-                      child: const Text('Submit'),
+                      child: Text('Submit'),
                     ),
                   ],
                 ),
@@ -282,7 +273,9 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
           } else if (state is EmpLeaveRequestErrorState) {
             return Text("Error: ${state.message}");
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           }
         },
       ),

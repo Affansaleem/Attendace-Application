@@ -4,9 +4,17 @@ part of 'api_intigration_bloc.dart';
 abstract class ApiIntigrationEvent extends Equatable{}
 
 class ApiLoadingEvent extends ApiIntigrationEvent{
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
+  final String corporateId;
+  final String username;
+  final String password;
 
+  ApiLoadingEvent({
+    required this.corporateId,
+    required this.username,
+    required this.password,
+  });
+
+  @override
+  List<Object?> get props => [corporateId, username, password];
 
 }

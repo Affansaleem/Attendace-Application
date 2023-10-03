@@ -4,14 +4,18 @@ import 'package:project/api_intigration_files/models/user_model.dart';
 
 class UserRepository {
   final apiUrl = "http://62.171.184.216:9595/api/login";
-  Future<List<Employee>> getData() async {
+  Future<List<Employee>> getData({
+    required String corporateId,
+    required String username,
+    required String password,
+  }) async {
     final Map<String, dynamic> data = {
-      "user_Name": "1999",
-      "user_Password": "1999",
+      "user_Name": username,
+      "user_Password": password,
       "email": "a",
       "mobile": "a",
       "role": "employee",
-      "corporateId": "ptsoffice"
+      "corporateId": corporateId,
     };
 
     final headers = {

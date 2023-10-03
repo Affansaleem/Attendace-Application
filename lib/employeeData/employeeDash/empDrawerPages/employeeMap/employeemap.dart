@@ -49,7 +49,7 @@ class _EmployeeMapState extends State<EmployeeMap> {
 
       print("Latitude: $getLat");
       print("Longitude: $getLong");
-    }  else {}
+    } else {}
   }
 
   Future<void> checkLocationPermission() async {
@@ -88,9 +88,9 @@ class _EmployeeMapState extends State<EmployeeMap> {
 
   Future<void> display() async {
     await loadCoordinatesFromSharedPreferences();
-    print("${getLat} ${getLong}");
+    print("$getLat ${getLong}");
     await checkLocationPermissionAndFetchLocation();
-    print("${currentLat} ${currentLong}");
+    print("$currentLat $currentLong");
   }
 
   Future<void> checkLocationPermissionAndFetchLocation() async {
@@ -266,16 +266,16 @@ class _EmployeeMapState extends State<EmployeeMap> {
                         const SizedBox(height: 7),
                         Text(
                           "Address: $address",
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         ),
-                        SizedBox(height: 7),
+                        const SizedBox(height: 7),
                         Text(
                           "Date: $currentDate",
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         ),
                         Text(
                           "Time: $currentTime",
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
@@ -305,7 +305,7 @@ class _EmployeeMapState extends State<EmployeeMap> {
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: Text('OK'),
+                                child: const Text('OK'),
                               ),
                             ],
                           );

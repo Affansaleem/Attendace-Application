@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../adminData/adminDash/adminDrawerbuilding/adminMain.dart';
 import '../api_intigration_files/api_integration_files/admin_getraw_request.dart';
 import '../api_intigration_files/api_integration_files/employee_getraw_request.dart';
+import '../api_intigration_files/repository/user_repository.dart';
 import '../employeeData/employeeDash/empDrawerBuilding/employeeMain.dart';
 import 'half_circle_clipper.dart';
 import 'login_bloc/loginEvents.dart';
@@ -24,8 +25,6 @@ enum UserType { employee, admin }
 
 class _LoginPageState extends State<LoginPage> {
   UserType? _selectedUserType = UserType.employee; // Default selection
-  AdminApi admin = AdminApi();
-  EmployeeApi employee = EmployeeApi();
   final _passwordController = TextEditingController();
   final _CoorporateIdController = TextEditingController();
   final _UserController = TextEditingController();
@@ -33,6 +32,52 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late bool _isButtonPressed = false;
   static const String KEY_LOGIN = "Login";
+  final UserRepository userRepository = UserRepository(); // Create an instance of UserRepository
+
+
+  void _handleAdminLogin(
+      String enteredCorporateID,
+      String enteredUsername,
+      String enteredPassword,
+      ) async {
+    try {
+      final employeeData = await userRepository.getData(
+        corporateId: enteredCorporateID,
+        username: enteredUsername,
+        password: enteredPassword,
+      );
+
+      if (employeeData.isNotEmpty) {
+        _loginAsAdmin();
+      } else {
+        _showErrorSnackbar(context, "User not found!");
+      }
+    } catch (e) {
+      _showErrorSnackbar(context, "User not found!");
+    }
+  }
+
+  void _handleEmployeeLogin(
+      String enteredCorporateID,
+      String enteredUsername,
+      String enteredPassword,
+      ) async {
+    try {
+      final employeeData = await userRepository.getData(
+        corporateId: enteredCorporateID,
+        username: enteredUsername,
+        password: enteredPassword,
+      );
+
+      if (employeeData.isNotEmpty) {
+        _loginAsEmployee();
+      } else {
+        _showErrorSnackbar(context, "User not found!");
+      }
+    } catch (e) {
+      _showErrorSnackbar(context, "User not found!");
+    }
+  }
 
   void _showErrorSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -52,12 +97,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _loginAsEmployee() async {
-    await employee.getData();
     await _successScaffoldMessage(context,"Login Successful");
     await Future.delayed(Duration(seconds: 2));
-
-
-
 
     Navigator.pushReplacement(
         context,
@@ -66,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _loginAsAdmin() async {
-    await admin.getData();
+
     await _successScaffoldMessage(context,"Login Successful");
     await Future.delayed(Duration(seconds: 2));
     Navigator.pushReplacement(
@@ -92,37 +133,28 @@ class _LoginPageState extends State<LoginPage> {
 
       // saving corporateId
       final sharedPrefEmp = await SharedPreferences.getInstance();
-      sharedPref.setString('corporate_id', enteredCorporateID);
+      sharedPrefEmp.setString('corporate_id', enteredCorporateID);
+      sharedPrefEmp.setString('user_name', enteredUsername);
+      sharedPrefEmp.setString('password', enteredPassword);
 
-      // Hardcoded values for corporate ID, username, and password for Admin
-      final hardcodedCorporateIDAdmin = "ptsoffice";
-      final hardcodedUsernameAdmin = "ptsadmin";
-      final hardcodedPasswordAdmin = "Reenoip@1234";
 
-      // Hardcoded values for corporate ID, username, and password for Employee
-
-      final hardcodedCorporateIDEmployee = "ptsoffice";
-      final hardcodedUsernameEmployee = "1999";
-      final hardcodedPasswordEmployee = "1999";
 
       if (_selectedUserType == UserType.employee) {
         // Execute employee-related functions
         _handleEmployeeLogin(
-            enteredCorporateID,
-            hardcodedCorporateIDEmployee,
-            enteredUsername,
-            hardcodedUsernameEmployee,
-            enteredPassword,
-            hardcodedPasswordEmployee);
+          enteredCorporateID,
+          enteredUsername,
+          enteredPassword,
+        );
+
       } else if (_selectedUserType == UserType.admin) {
         // Execute admin-related functions
         _handleAdminLogin(
-            enteredCorporateID,
-            hardcodedCorporateIDAdmin,
-            enteredUsername,
-            hardcodedUsernameAdmin,
-            enteredPassword,
-            hardcodedPasswordAdmin);
+          enteredCorporateID,
+          enteredUsername,
+          enteredPassword,
+        );
+
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -144,37 +176,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _handleAdminLogin(
-      String enteredCorporateID,
-      String hardcodedCorporateIDAdmin,
-      String enteredUsername,
-      String hardcodedUsernameAdmin,
-      String enteredPassword,
-      String hardcodedPasswordAdmin) {
-    if (enteredCorporateID == hardcodedCorporateIDAdmin &&
-        enteredUsername == hardcodedUsernameAdmin &&
-        enteredPassword == hardcodedPasswordAdmin) {
-      _loginAsAdmin();
-    } else {
-      _showErrorSnackbar(context, "User not found!");
-    }
-  }
 
-  void _handleEmployeeLogin(
-      String enteredCorporateID,
-      String hardcodedCorporateIDEmployee,
-      String enteredUsername,
-      String hardcodedUsernameEmployee,
-      String enteredPassword,
-      String hardcodedPasswordEmployee) {
-    if (enteredCorporateID == hardcodedCorporateIDEmployee &&
-        enteredUsername == hardcodedUsernameEmployee &&
-        enteredPassword == hardcodedPasswordEmployee) {
-      _loginAsEmployee();
-    } else {
-      _showErrorSnackbar(context, "User not found!");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

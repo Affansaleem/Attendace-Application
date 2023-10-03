@@ -14,7 +14,6 @@ class EmpReportsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime currentDate = DateTime.now();
 
     return Scaffold(
       appBar:  AppBar(

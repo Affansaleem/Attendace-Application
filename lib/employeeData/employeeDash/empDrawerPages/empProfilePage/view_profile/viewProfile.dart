@@ -4,16 +4,42 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:project/api_intigration_files/api_integration_files/api_intigration_bloc.dart';
 import 'package:project/api_intigration_files/repository/user_repository.dart';
 import 'package:project/api_intigration_files/models/user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+class EmpViewPage extends StatefulWidget {
+  @override
+  _EmpViewPageState createState() => _EmpViewPageState();
+}
 
-class EmpViewPage extends StatelessWidget {
+class _EmpViewPageState extends State<EmpViewPage> {
+  late String username;
+  late String corporateId;
+  late String password;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch data from shared preferences when the widget is initialized
+    getShared();
+  }
+
+  Future<void> getShared() async {
+    final sharedPrefEmp = await SharedPreferences.getInstance();
+    setState(() {
+      corporateId = sharedPrefEmp.getString('corporate_id')!;
+      username = sharedPrefEmp.getString('user_name')!;
+      password = sharedPrefEmp.getString('password')!;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
         return ApiIntigrationBloc(
           RepositoryProvider.of<UserRepository>(context),
-        )..add(ApiLoadingEvent());
+        )..add(ApiLoadingEvent(
+            corporateId: corporateId, username: username, password: password));
       },
       child: Scaffold(
         appBar: AppBar(
@@ -65,7 +91,7 @@ class EmpViewPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(50),
                       ),
                       padding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: const Text(
                         "Software Engineer",
                         style: TextStyle(
@@ -107,13 +133,13 @@ class EmpViewPage extends StatelessWidget {
                             radius: 20, // Smaller radius for the circle avatars
                             backgroundColor: Colors.blue,
                             child:
-                                Icon(Icons.mail, size: 25, color: Colors.white),
+                            Icon(Icons.mail, size: 25, color: Colors.white),
                           ),
                           CircleAvatar(
                             radius: 20,
                             backgroundColor: Colors.green,
                             child:
-                                Icon(Icons.call, size: 25, color: Colors.white),
+                            Icon(Icons.call, size: 25, color: Colors.white),
                           ),
                           CircleAvatar(
                             radius: 20,
@@ -197,7 +223,7 @@ class EmpViewPage extends StatelessWidget {
                             const Text(
                               "Attendance Percentage",
                               style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
+                              TextStyle(fontSize: 16, color: Colors.grey),
                             ),
                           ],
                         ),

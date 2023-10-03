@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
@@ -16,16 +15,18 @@ class ApiIntigrationBloc
     on<ApiLoadingEvent>((event, emit) async {
       print("ApiLoadingEvent emitted");
       emit(ApiLoadingState());
-      try{
-        final users=await _userRepository.getData();
+      try {
+        // Pass the required parameters when calling getData
+        final users = await _userRepository.getData(
+          corporateId: event.corporateId,
+          username: event.username,
+          password: event.password,
+        );
         emit(ApiLoadedState(users));
-      }
-      catch (e) {
+      } catch (e) {
         print("API Error: $e"); // Add this line to print the error message
         emit(ApiErrorState("Failed to fetch data from the API: $e"));
       }
-      // print("hey you emit first state");
     });
-
   }
 }

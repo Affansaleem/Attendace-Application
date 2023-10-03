@@ -18,7 +18,7 @@ class AdminReportsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime currentDate = DateTime.now();
+    // DateTime currentDate = DateTime.now();
 
     return BlocConsumer<InternetBloc, InternetStates>(
       listener: (context, state) {

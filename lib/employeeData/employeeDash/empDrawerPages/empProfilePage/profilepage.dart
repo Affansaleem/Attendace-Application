@@ -145,7 +145,7 @@ Widget _buildField(String label, String value) {
         ),
       ),
       Text(
-      value != null && value.isNotEmpty ? value : "---",
+      value.isNotEmpty ? value : "---",
         style: GoogleFonts.montserrat(
           textStyle: const TextStyle(
             fontWeight: FontWeight.bold,
