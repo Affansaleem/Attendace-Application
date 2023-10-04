@@ -41,6 +41,12 @@ dependencies:
   flutter_native_splash: ^2.3.2
   equatable: ^2.0.5
   fluttertoast: ^8.0.9
+  image_to_byte: ^1.0.0
+  camera: ^0.10.5+5
+  permission_handler: ^11.0.0
+
+
+
 
 flutter_native_splash:
   color: "#FFD580"

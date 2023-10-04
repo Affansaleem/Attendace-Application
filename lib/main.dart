@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:project/api_intigration_files/repository/EmpEditProfile_repository.dart';
 import 'package:project/api_intigration_files/repository/LeaveHistory_repository.dart';
 import 'package:project/api_intigration_files/repository/emp_leave_request_repository.dart';
 import 'package:project/api_intigration_files/repository/emp_post_leave_request_repository.dart';
 import 'package:project/api_intigration_files/repository/emp_profile_repository.dart';
 import 'package:project/app_startUp.dart';
+import 'api_intigration_files/EmpEditProfile_apiFiles/emp_edit_profile_bloc.dart';
 import 'api_intigration_files/api_integration_files/api_intigration_bloc.dart';
 import 'api_intigration_files/repository/emp_attendance_status_repository.dart';
 import 'api_intigration_files/repository/user_repository.dart';
@@ -49,6 +51,9 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<LeaveHistoryRepository>(
           create: (_) => LeaveHistoryRepository(),
         ),
+        RepositoryProvider<EmpEditProfileRepository>(
+          create: (_) => EmpEditProfileRepository(),
+        ),
         // Add other repository providers if needed
       ],
       child: MultiBlocProvider(
@@ -61,6 +66,13 @@ class MyApp extends StatelessWidget {
           BlocProvider<ApiIntigrationBloc>(
             create: (BuildContext context) {
               return ApiIntigrationBloc(UserRepository());
+            },
+          ),
+          BlocProvider<EmpEditProfileBloc>(
+            create: (BuildContext context) {
+              return EmpEditProfileBloc(
+                empEditProfileRepository: EmpEditProfileRepository(),
+              );
             },
           ),
         ],

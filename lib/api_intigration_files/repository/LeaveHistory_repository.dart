@@ -25,7 +25,7 @@ class LeaveHistoryRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
-        print(responseData);
+
         final List<LeaveHistoryModel> leaveHistoryList = responseData.map((item) {
           return LeaveHistoryModel.fromJson(item);
         }).toList();

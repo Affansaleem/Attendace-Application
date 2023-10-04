@@ -16,8 +16,7 @@ class EmpProfileRepository {
     SharedPreferences pref = await SharedPreferences.getInstance();
     coorporateId = pref.getString("corporate_id")!;
     employeeId = pref.getInt("employee_id")!;
-    print(coorporateId);
-    print(employeeId);
+
   }
 
   Future<List<EmpProfileModel>> getData() async {
@@ -40,8 +39,6 @@ class EmpProfileRepository {
       headers: headers,
     );
 
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = json.decode(response.body);

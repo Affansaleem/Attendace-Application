@@ -18,8 +18,7 @@ class EmpDashRepository {
       headers: headers,
     );
 
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
+
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);

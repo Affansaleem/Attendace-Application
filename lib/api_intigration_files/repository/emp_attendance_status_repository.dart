@@ -35,8 +35,7 @@ class EmpAttendanceRepository {
       headers: headers,
     );
 
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
+
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = json.decode(response.body);

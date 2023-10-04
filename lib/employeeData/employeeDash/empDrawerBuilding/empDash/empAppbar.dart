@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../api_intigration_files/api_integration_files/api_intigration_bloc.dart';
-import 'package:project/api_intigration_files/models/user_model.dart';
+import '../../../../api_intigration_files/models/user_model.dart';
 import '../../../../api_intigration_files/repository/user_repository.dart';
 
 class EmpAppBar extends StatelessWidget {
@@ -136,7 +137,7 @@ class EmpAppBar extends StatelessWidget {
           );
         } else {
           // Data is still being fetched from shared preferences, you can show a loading indicator here
-          return CircularProgressIndicator(); // Replace with your loading indicator widget
+          return const CircularProgressIndicator(); // Replace with your loading indicator widget
         }
       },
     );

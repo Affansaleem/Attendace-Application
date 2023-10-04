@@ -32,8 +32,6 @@ class UserRepository {
 
     final responseStream = await response.stream.bytesToString();
 
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: $responseStream");
 
     if (response.statusCode == 200) {
       final List responseData = json.decode(responseStream);

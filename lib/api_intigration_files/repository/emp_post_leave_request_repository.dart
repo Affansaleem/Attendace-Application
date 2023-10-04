@@ -21,8 +21,7 @@ class SubmissionRepository {
       body: requestBody,
     );
 
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
+
 
     if (response.statusCode == 200) {
       // Request was successful
