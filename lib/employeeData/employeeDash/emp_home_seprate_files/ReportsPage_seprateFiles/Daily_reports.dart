@@ -51,15 +51,19 @@ class _DailyReportsPageState extends State<DailyReportsPage> {
       final int? employeeId = prefs.getInt('employee_id');
 
       if (corporateId != null && employeeId != null) {
-        final reports = await _repository.getDailyReports(
+        final response = await _repository.getDailyReports(
           corporateId: corporateId,
           employeeId: employeeId,
           reportDate: reportDateTime,
         );
 
-        setState(() {
-          _dailyReports = reports; // Update the list of fetched reports
-        });
+        if (response is List<DailyReportsModel>) {
+          setState(() {
+            _dailyReports = response; // Update the list of fetched reports
+          });
+        } else {
+          print('API response is not a List of DailyReportsModel');
+        }
       } else {
         print('Corporate ID or Employee ID is null');
       }
