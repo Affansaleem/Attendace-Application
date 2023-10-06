@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:project/api_intigration_files/models/submission_model.dart'; // Import your SubmissionModel
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SubmissionRepository {
-  final String baseUrl =
-      "http://62.171.184.216:9595/api/employee/leave/addleaverequest";
+import '../models/GeoFencing_model.dart';
 
-  Future<void> postData(SubmissionModel submissionModel) async {
+class GeoFenceRepository {
+  final String baseUrl = "http://62.171.184.216:9595/api/employee/location/AddGeoPunch";
+
+  Future<void> postData(GeoFenceModel feoFenceModel) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String corporateId = prefs.getString('corporate_id') ?? "";
 
@@ -19,7 +19,7 @@ class SubmissionRepository {
 
     final client = http.Client();
 
-    final requestBody = jsonEncode(submissionModel.toJson());
+    final requestBody = jsonEncode(feoFenceModel.toJson());
 
     final response = await client.post(
       Uri.parse(apiUrl),
@@ -29,7 +29,8 @@ class SubmissionRepository {
 
     if (response.statusCode == 200) {
       // Request was successful
-      print("Response submitted");
+      print("------------Response submitted Successfully Thanks!--------------");
+      print(response.body);
     } else {
       // Request failed, log status code and response content
       print("Failed to fetch data from the API. Status code: ${response.statusCode}");

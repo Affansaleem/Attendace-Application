@@ -5,19 +5,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:project/api_intigration_files/repository/EmpEditProfile_repository.dart';
+import 'package:project/employeeData/employeeDash/empDrawerPages/empProfilePage/profilepage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import '../../../../../../api_intigration_files/models/EmpEditProfile_model.dart';
 import '../../../../../../api_intigration_files/models/user_model.dart';
 import '../../../../../../api_intigration_files/repository/user_repository.dart';
-import 'package:camera/camera.dart'; // Import the camera package
+import 'package:camera/camera.dart';
 import 'package:project/api_intigration_files/EmpEditProfile_apiFiles/emp_edit_profile_bloc.dart';
 
 class EmpEditProfilePage extends StatefulWidget {
   const EmpEditProfilePage({super.key});
-
   @override
   State<EmpEditProfilePage> createState() => _EmpEditProfilePageState();
 }
@@ -40,6 +41,7 @@ class _EmpEditProfilePageState extends State<EmpEditProfilePage> {
   String phoneNo = "---";
   bool isPasswordVisible = false;
   File? _profilePicture;
+  String? base64Image;
 
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
@@ -82,6 +84,24 @@ class _EmpEditProfilePageState extends State<EmpEditProfilePage> {
     );
 
     if (pickedFile != null) {
+      final imageBytes = await pickedFile.readAsBytes();
+      base64Image = base64Encode(imageBytes);
+
+      setState(() {
+        _profilePicture = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _pickFromGallery() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      final imageBytes = await pickedFile.readAsBytes();
+      base64Image = base64Encode(imageBytes);
+
       setState(() {
         _profilePicture = File(pickedFile.path);
       });
@@ -132,15 +152,22 @@ class _EmpEditProfilePageState extends State<EmpEditProfilePage> {
     }
   }
 
-  Future<void> _pickFromGallery() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _profilePicture = File(pickedFile.path);
-      });
-    }
-  }
+  // Future<void> _pickFromGallery() async {
+  //   final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  //
+  //
+  //   if (pickedFile != null) {
+  //     final imageBytes = await pickedFile.readAsBytes();
+  //     final base64Image = base64Encode(imageBytes);
+  //
+  //     setState(() {
+  //       _profilePicture = File(pickedFile.path);
+  //     });
+  //
+  //     // Now you have the base64 encoded image to send to your API.
+  //     // You can include it in the request body when submitting the form.
+  //   }
+  // }
 
   @override
   void initState() {
@@ -201,8 +228,8 @@ class _EmpEditProfilePageState extends State<EmpEditProfilePage> {
                     },
                     child: Center(
                       child: Container(
-                        width: 200,
-                        height: 200,
+                        width: 150,
+                        height: 150,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -332,63 +359,86 @@ class _EmpEditProfilePageState extends State<EmpEditProfilePage> {
                   ),
                   const SizedBox(height: 20),
                   Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          final dataToSubmit = EmpEditProfileModel(
-                            empId: 3,
-                            empName: empNameController.text,
-                            fatherName: fatherNameController.text,
-                            pwd: pwdController.text,
-                            emailAddress: emailAddressController.text,
-                            phoneNo: phoneNoController.text,
-                            profilePic: null,
-                            // Add other fields as needed
+                      child: Center(
+                    child:
+                        BlocConsumer<EmpEditProfileBloc, EmpEditProfileState>(
+                      listener: (context, state) {
+                        if (state is EmpEditProfileSuccess) {
+                          // Show a success toast message when data is submitted successfully
+                          Fluttertoast.showToast(
+                            msg: "Data submitted successfully!",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity:
+                                ToastGravity.CENTER, // Adjust gravity as needed
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.green,
+                            textColor: Colors.white,
                           );
-                          // Call the function to submit data to the API
-                          _submitDataToAPI(dataToSubmit);
+                        } else if (state is EmpEditProfileError) {
+                          // Show a failure toast message when data submission fails
+                          Fluttertoast.showToast(
+                            msg: "Failed to submit data. Please try again.",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity:
+                                ToastGravity.CENTER, // Adjust gravity as needed
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                      ),
-                      child: Text(
-                        'Save',
-                        style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
-                  ),
+                      builder: (context, state) {
+                        return Builder(
+                          builder: (context) {
+                            return ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState!.save();
+                                  final dataToSubmit = EmpEditProfileModel(
+                                    empId: 3,
+                                    empName: empNameController.text,
+                                    fatherName: fatherNameController.text,
+                                    pwd: pwdController.text,
+                                    emailAddress: emailAddressController.text,
+                                    phoneNo: phoneNoController.text,
+                                    profilePic: base64Image,
+                                    // Add other fields as needed
+                                  );
+                                  // Call the function to submit data to the API
+                                  _submitDataToAPI(dataToSubmit);
+                                  await Future.delayed(Duration(seconds: 1));
+                                  setState(() {
+                                  });
+                                  Navigator.pop(context);
+                                  Fluttertoast.showToast(
+                                    msg: "Data submitted successfully!",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity
+                                        .TOP, // Adjust gravity as needed
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.green,
+                                    textColor: Colors.white,
+                                  );
 
-                  BlocListener<EmpEditProfileBloc, EmpEditProfileState>(
-                    listener: (context, state) {
-                      if (state is EmpEditProfileSuccess) {
-                        // Show a success toast message when data is submitted successfully
-                        Fluttertoast.showToast(
-                          msg: "Data submitted successfully!",
-                          toastLength:
-                              Toast.LENGTH_LONG, // Increase the duration
-                          gravity: ToastGravity.BOTTOM,
-                          backgroundColor: Colors.green,
-                          textColor: Colors.white,
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                              ),
+                              child: Text(
+                                'Save',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
+                          }
                         );
-                      } else if (state is EmpEditProfileFailure) {
-                        // Show a failure toast message when data submission fails
-                        Fluttertoast.showToast(
-                          msg: "Failed to submit data. Please try again.",
-                          toastLength:
-                              Toast.LENGTH_LONG, // Increase the duration
-                          gravity: ToastGravity.BOTTOM,
-                          backgroundColor: Colors.green,
-                          textColor: Colors.white,
-                        );
-                      }
-                    },
-                    child: Container(), // Placeholder child widget
-                  ),
+                      },
+                    ),
+                  ))
                 ],
               ),
             ),

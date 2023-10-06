@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:project/api_intigration_files/emp_attendane_dash_api_files/emp_attendance_bloc.dart';
 import 'package:project/api_intigration_files/models/emp_attendance_status_model.dart';
 import 'package:project/api_intigration_files/repository/emp_attendance_status_repository.dart';
@@ -14,6 +15,7 @@ import '../../../../api_intigration_files/models/emp_dash_model.dart';
 import '../../../../api_intigration_files/repository/emp_dash_repository.dart';
 import '../../../../bloc_internet/internet_bloc.dart';
 import '../../empDrawerPages/employeeMap/employeemap.dart';
+import '../../emp_home_seprate_files/ReportsPage_seprateFiles/ReportsMainPage.dart';
 import '../../emp_home_seprate_files/leave_report_main_page.dart';
 
 class EmpDashHome extends StatefulWidget {
@@ -181,7 +183,8 @@ class _HomePageState extends State<EmpDashHome> {
                                                 width: 120,
                                                 height: 80,
                                               ),
-                                              background: const Color(0xFFE26142),
+                                              background:
+                                                  const Color(0xFFE26142),
                                             ),
                                           ),
                                         ],
@@ -191,7 +194,7 @@ class _HomePageState extends State<EmpDashHome> {
                                 ),
                                 Container(
                                   height: 80,
-                                  child:  Row(
+                                  child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     mainAxisSize: MainAxisSize.max,
@@ -200,21 +203,35 @@ class _HomePageState extends State<EmpDashHome> {
                                         width: 5,
                                       ),
                                       ProfileInfoCard(
-                                          firstText: "IN", secondText: employeeAttendance.in1 != null ? employeeAttendance.status:"---"),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      ProfileInfoCard(
-                                          firstText: "Status", secondText: employeeAttendance.status != null?employeeAttendance.status:"---"),
-                                      const SizedBox(
-                                        width: 10,
+                                        firstText: "OUT",
+                                        secondText: employeeAttendance.in1 !=
+                                                null
+                                            ? DateFormat('HH:mm:ss')
+                                                .format(employeeAttendance.in1!)
+                                            : "---",
                                       ),
                                       const SizedBox(
                                         width: 10,
                                       ),
                                       ProfileInfoCard(
-                                          firstText: "OUT",
-                                          secondText: employeeAttendance.out2 != null? employeeAttendance.out2 : "---"),
+                                          firstText: "Status",
+                                          secondText:
+                                              employeeAttendance.status ??
+                                                  "---"),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      ProfileInfoCard(
+                                        firstText: "OUT",
+                                        secondText:
+                                            employeeAttendance.out2 != null
+                                                ? DateFormat('HH:mm:ss').format(
+                                                    employeeAttendance.out2!)
+                                                : "---",
+                                      ),
                                       const SizedBox(
                                         width: 5,
                                       ),
@@ -307,13 +324,24 @@ class _HomePageState extends State<EmpDashHome> {
                                                   const Color(0xFFE26142),
                                             ),
                                             onTap: () {
-                                              Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                                                // return LeaveRequestForm();
-                                                return LeaveRequestPage();
-                                              },));
+                                              Navigator.push(context,
+                                                  CupertinoPageRoute(
+                                                builder: (context) {
+                                                  // return LeaveRequestForm();
+                                                  return LeaveRequestPage();
+                                                },
+                                              ));
                                             },
                                           ),
                                           GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  PageTransition(
+                                                      child: ReportsMainPage(),
+                                                      type: PageTransitionType
+                                                          .rightToLeft));
+                                            },
                                             child: ItemDashboard(
                                               showShadow: false,
                                               title: 'Reports',

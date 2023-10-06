@@ -26,7 +26,7 @@ class EmpProfileRepository {
     }
 
     String apiUrl =
-        "http://62.171.184.216:9595/api/dashboard/profile?CorporateId=$coorporateId&employeeId=$employeeId";
+        "http://62.171.184.216:9595/api/employee/dashboard/profile?CorporateId=$coorporateId&employeeId=$employeeId";
 
     final headers = {
       'Content-Type': 'application/json', // Set the content type to JSON

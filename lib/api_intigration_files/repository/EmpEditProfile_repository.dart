@@ -5,7 +5,7 @@ import '../models/EmpEditProfile_model.dart';
 
 class EmpEditProfileRepository {
   final String apiUrl =
-      "http://62.171.184.216:9595/api/Dashboard/UpdateProfile";
+      "http://62.171.184.216:9595/api/employee/dashboard/updateprofile";
 
   Future<void> postData(EmpEditProfileModel empEditProfileModel) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

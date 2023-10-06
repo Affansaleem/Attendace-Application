@@ -22,7 +22,7 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
   DateTime _toDate = DateTime.now();
   final EmpPostRequestBloc _postRequestBloc = EmpPostRequestBloc(
     submissionRepository:
-    SubmissionRepository(), // Provide your repository here
+        SubmissionRepository(), // Provide your repository here
   );
 
   Future<void> getSharedData() async {
@@ -93,12 +93,15 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
           } else if (state is EmpLeaveRequestLoadedState) {
             int selectedTypeId = 0;
             List<EmpLeaveModel> userList = state.users;
-            final employeeLeave1 =
-            userList.isNotEmpty ? userList[0] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
-            final employeeLeave2 =
-            userList.length > 1 ? userList[1] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
-            final employeeLeave3 =
-            userList.length > 2 ? userList[2] : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
+            final employeeLeave1 = userList.isNotEmpty
+                ? userList[0]
+                : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
+            final employeeLeave2 = userList.length > 1
+                ? userList[1]
+                : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
+            final employeeLeave3 = userList.length > 2
+                ? userList[2]
+                : EmpLeaveModel(leaveTypeId: 0, ltypeCode: '', ltypeName: '');
 
             selectedTypeId = employeeLeave1.leaveTypeId ?? 0;
 
@@ -218,24 +221,22 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                       onPressed: () async {
                         final selectedLeaveDuration =
                             _leaveDurationController.text;
-                        final selectedReason =
-                            _reasonController.text;
+                        final selectedReason = _reasonController.text;
                         final selectedTypeId =
                             _reasonToLTypeId[selectedReason] ?? 0;
 
                         final submissionModel = SubmissionModel(
                           employeeId: empId.toString(),
                           fromDate:
-                          "${_fromDate.toLocal().toIso8601String().split('T')[0]}T00:00:00Z",
+                              "${_fromDate.toLocal().toIso8601String().split('T')[0]}T00:00:00Z",
                           toDate:
-                          "${_toDate.toLocal().toIso8601String().split('T')[0]}T00:00:00Z",
+                              "${_toDate.toLocal().toIso8601String().split('T')[0]}T00:00:00Z",
                           reason: selectedReason,
                           leaveId: selectedTypeId,
-                          leaveDuration:
-                          selectedLeaveDuration,
+                          leaveDuration: selectedLeaveDuration,
                           status: 'UnApproved',
                           applicationDate:
-                          "${DateTime.now().toIso8601String().split('T')[0]}T00:00:00Z",
+                              "${DateTime.now().toIso8601String().split('T')[0]}T00:00:00Z",
                           remark: '',
                         );
 
@@ -254,13 +255,16 @@ class _LeaveRequestFormState extends State<LeaveRequestForm> {
                         await Future.delayed(const Duration(seconds: 2));
 
                         if (_postRequestBloc.state is SubmissionSuccess) {
+                          print("Successful");
                           Fluttertoast.showToast(
                             msg: "Request submitted successfully",
                           );
                         } else if (_postRequestBloc.state is SubmissionError) {
+                          print("Not Successful");
+
                           Fluttertoast.showToast(
                             msg:
-                            "Error: ${(_postRequestBloc.state as SubmissionError).error}",
+                                "Error: ${(_postRequestBloc.state as SubmissionError).error}",
                           );
                         }
                       },

@@ -1,12 +1,18 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+import 'dart:convert';
+
+import '../../../../api_intigration_files/models/GeoFencing_model.dart';
+import '../../../../api_intigration_files/repository/GeoFence_repository.dart';
 
 class EmployeeMap extends StatefulWidget {
   EmployeeMap({Key? key}) : super(key: key);
@@ -23,33 +29,19 @@ class _EmployeeMapState extends State<EmployeeMap> {
   double? currentLat;
   double? currentLong;
   bool locationError = false;
-  String address = "";
+  String fullAddress = "";
+  String countryName = "";
 
   File? selectedImage;
   String base64Image = "";
+  late String sublocaity;
 
   @override
   void initState() {
     super.initState();
     checkLocationPermission();
-    loadCoordinatesFromSharedPreferences();
     display();
     checkLocationPermissionAndFetchLocation();
-  }
-
-  Future<void> loadCoordinatesFromSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final latitude = prefs.getDouble('latitude');
-    final longitude = prefs.getDouble('longitude');
-
-    if (latitude != null && longitude != null) {
-      getLat = latitude;
-      getLong = longitude;
-
-      print("Latitude: $getLat");
-      print("Longitude: $getLong");
-    } else {}
   }
 
   Future<void> checkLocationPermission() async {
@@ -62,7 +54,7 @@ class _EmployeeMapState extends State<EmployeeMap> {
     });
   }
 
-  void _startGeoFencingUpdate() {
+  Future<void> _startGeoFencingUpdate() async {
     final double? geofenceLatitude = getLat;
     final double? geofenceLongitude = getLong;
     const double geofenceRadius = 250;
@@ -86,11 +78,80 @@ class _EmployeeMapState extends State<EmployeeMap> {
     }
   }
 
+  Future<void> _markAttendance() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String cardNo = prefs.getString('cardNo') ?? " ";
+    String imei="fake imei";
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo? androidInfo;
+    Future<AndroidDeviceInfo> getInfo() async {
+      return await deviceInfo.androidInfo;
+    }
+
+    print(getInfo());
+    if (selectedImage == null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Please take a photo before proceeding.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      final base64Image = base64Encode(selectedImage!.readAsBytesSync());
+      final geoFenceModel = GeoFenceModel(
+        cardNo: cardNo,
+        location: fullAddress,
+        lan: currentLat.toString(),
+        long: currentLong.toString(),
+        imageData: base64Image,
+        imeiNo: imei ,
+        temp1: '',
+        temp2: '',
+        attendanceType: null,
+        remark1: remarks,
+        imagePath: '',
+        punchDatetime: DateTime.now(),
+      );
+      final geoFenceRepository = GeoFenceRepository();
+
+      try {
+        await geoFenceRepository.postData(geoFenceModel);
+        Fluttertoast.showToast(
+          msg: 'Attendance marked successfully!',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+      } catch (e) {
+        print('Error making API request: $e');
+        Fluttertoast.showToast(
+          msg:
+              'Failed to mark attendance. Please check your internet connection.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    }
+  }
+
   Future<void> display() async {
-    await loadCoordinatesFromSharedPreferences();
-    print("$getLat ${getLong}");
     await checkLocationPermissionAndFetchLocation();
-    print("$currentLat $currentLong");
   }
 
   Future<void> checkLocationPermissionAndFetchLocation() async {
@@ -105,7 +166,7 @@ class _EmployeeMapState extends State<EmployeeMap> {
         if (mounted) {
           currentLat = data.latitude;
           currentLong = data.longitude;
-          address = getAddress(currentLat, currentLong);
+          await getAddress(currentLat!, currentLong!);
           locationError = false;
         }
       } catch (e) {
@@ -158,13 +219,29 @@ class _EmployeeMapState extends State<EmployeeMap> {
     );
   }
 
-  getAddress(lat, long) async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
-    if (mounted) {
-      setState(() {
-        address =
-            "${placemarks[0].street!}, ${placemarks[4].street!} , ${placemarks[0].country!}";
-      });
+  Future<void> getAddress(double lat, double long) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(lat, long);
+      if (mounted && placemarks.isNotEmpty) {
+        setState(() {
+          if (placemarks[0].street != null) {
+            fullAddress = placemarks[0].street!;
+          }
+          if (placemarks[0].subLocality != null) {
+            sublocaity = placemarks[0].subLocality!;
+          }
+          final List<String> countryNameParts = [];
+          if (placemarks[0].locality != null) {
+            countryNameParts.add(placemarks[0].locality!);
+          }
+          if (placemarks[0].country != null) {
+            countryNameParts.add(placemarks[0].country!);
+          }
+          countryName = countryNameParts.join(', ');
+        });
+      }
+    } catch (e) {
+      print('Error getting address: $e');
     }
   }
 
@@ -186,10 +263,12 @@ class _EmployeeMapState extends State<EmployeeMap> {
     super.dispose();
   }
 
+  String remarks = "";
+
   @override
   Widget build(BuildContext context) {
-    final currentTime = DateFormat('hh:mm a').format(DateTime.now());
-    final currentDate = DateFormat('MMM dd, yyyy').format(DateTime.now());
+    final currentDateTime =
+        DateFormat('MMM dd, yyyy hh:mm a').format(DateTime.now());
 
     if (locationError) {
       return AlertDialog(
@@ -205,117 +284,203 @@ class _EmployeeMapState extends State<EmployeeMap> {
           ),
         ],
       );
-    } else if ((currentLat != null && currentLong != null)) {
+    } else if (currentLat != null && currentLong != null) {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFFE26142),
           elevation: 0,
-          title: const Center(
-            child: Text(
-              "Attendance Portal",
-              style: TextStyle(
-                color: Colors.white,
-              ),
+          title: Text(
+            "Attendance Portal",
+            style: TextStyle(
+              color: Colors.white,
             ),
           ),
           iconTheme: const IconThemeData(
             color: Colors.white,
           ),
+          centerTitle: true,
         ),
         body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: ListView(
             children: [
-              CircleAvatar(
-                radius: MediaQuery.of(context).size.height / 5,
-                backgroundColor: Colors.transparent,
-                child: Padding(
-                  padding: const EdgeInsets.all(8), // Border radius
-                  child: ClipOval(
-                      child: selectedImage != null
-                          ? Image.file(
-                              selectedImage!,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.asset(
-                              "assets/icons/man.png",
-                            )),
-                ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Square image frame with rounded corners (Placeholder)
+                  Container(
+                    width: MediaQuery.of(context).size.height / 5,
+                    height: MediaQuery.of(context).size.height / 5,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.transparent,
+                    ),
+                  ),
+
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: selectedImage != null
+                        ? Image.file(
+                            selectedImage!,
+                            fit: BoxFit.cover,
+                            width: MediaQuery.of(context).size.height / 5,
+                            height: MediaQuery.of(context).size.height / 5,
+                          )
+                        : Image.asset(
+                            "assets/icons/man.png",
+                            width: MediaQuery.of(context).size.height / 5,
+                            height: MediaQuery.of(context).size.height / 5,
+                          ),
+                  ),
+                ],
               ),
-              if (address.isNotEmpty)
+              if (fullAddress.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(left: 25.0, right: 25.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
+                  child: Card(
+                    elevation: 4, // Add elevation for a raised appearance
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Center(
-                          child: Text(
-                            "Your Location:",
+                    // Use LinearGradient for a gradient background
+                    color: Colors
+                        .transparent, // Set the card background to transparent
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.deepOrange,
+                            Colors.orange
+                          ], // Define your two colors here
+                        ),
+                        borderRadius: BorderRadius.circular(25.0),
+                      ),
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Street: $fullAddress",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 7),
-                        Text(
-                          "Address: $address",
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 7),
-                        Text(
-                          "Date: $currentDate",
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          "Time: $currentTime",
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
+                          if (sublocaity.isNotEmpty)
+                            Text(
+                              "Sublocality: $sublocaity",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          Text(
+                            "Country: $countryName",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 7),
+                          const SizedBox(height: 7),
+                          Container(
+                            padding: const EdgeInsets.all(
+                                5.0), // Adjust padding as needed
+                            decoration: BoxDecoration(
+                              color: Colors
+                                  .white, // Background color for the date capsule
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Text(
+                              "$currentDateTime",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors
+                                    .deepOrange, // Text color for the date
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+
+              // Add Remarks TextField
+              Padding(
+                padding: const EdgeInsets.only(left: 25.0, right: 25.0),
+                child: TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Remarks',
+                    hintText: 'Enter your remarks...',
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      remarks = value;
+                    });
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 25.0, right: 25.0),
                 child: ElevatedButton(
                   onPressed: chooseImage,
-                  child: const Text("Click Your Photo"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors
+                        .orange, // Change to your desired background color
+                    padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 24), // Adjust padding as needed
+                  ),
+                  child: Text(
+                    "Click Your Photo",
+                    style: GoogleFonts.lato(
+                      // Replace with your desired Google Fonts style
+                      textStyle: TextStyle(
+                        fontSize: 16, // Adjust the font size as needed
+                        fontWeight:
+                            FontWeight.bold, // Adjust the font weight as needed
+                        color: Colors.white, // Change text color as needed
+                      ),
+                    ),
+                  ),
                 ),
+              ),
+              SizedBox(
+                height: 7,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 25.0, right: 25.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (selectedImage == null) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Error'),
-                            content: const Text(
-                                'Please take a photo before proceeding.'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    } else {
-                      _startGeoFencingUpdate();
-                    }
+                    _markAttendance();
                   },
-                  child: const Text("Mark Your Attendance"),
+                  style: ElevatedButton.styleFrom(
+                    primary:
+                        Colors.blue, // Change to your desired background color
+                    padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 24), // Adjust padding as needed
+                  ),
+                  child: Text(
+                    "Mark Your Attendance",
+                    style: TextStyle(
+                      fontSize: 16, // Adjust the font size as needed
+                      fontWeight:
+                          FontWeight.bold, // Adjust the font weight as needed
+                      color: Colors.white, // Change text color as needed
+                    ),
+                  ),
                 ),
               ),
             ],

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:project/api_intigration_files/models/user_model.dart';
 
 class UserRepository {
-  final apiUrl = "http://62.171.184.216:9595/api/login";
+  final apiUrl = "http://62.171.184.216:9595/api/employee/login";
   Future<List<Employee>> getData({
     required String corporateId,
     required String username,
@@ -35,9 +35,7 @@ class UserRepository {
 
     if (response.statusCode == 200) {
       final List responseData = json.decode(responseStream);
-      print(responseData[0]["empName"]);
 
-      print("helloworld");
       return responseData.map(((e) => Employee.fromJson(e))).toList();
     } else {
       throw Exception(

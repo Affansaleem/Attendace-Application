@@ -17,7 +17,7 @@ class EmpLeaveRepository {
   Future<String> getLeaveTypeName(int leaveId) async {
     final corporateId = await getCorporateId();
     final apiUrl =
-        "http://62.171.184.216:9595/api/Leave/GetLeaveType?CorporateId=$corporateId";
+        "http://62.171.184.216:9595/api/employee/leave/getleavetype?CorporateId=$corporateId";
 
     final headers = {
       'Content-Type': 'application/json', // Set the content type to JSON
@@ -52,7 +52,7 @@ class EmpLeaveRepository {
   Future<List<EmpLeaveModel>> getData() async {
     final corporateId = await getCorporateId();
     final apiUrl =
-        "http://62.171.184.216:9595/api/Leave/GetLeaveType?CorporateId=$corporateId";
+        "http://62.171.184.216:9595/api/employee/leave/getleavetype?CorporateId=$corporateId";
 
     final headers = {
       'Content-Type': 'application/json', // Set the content type to JSON

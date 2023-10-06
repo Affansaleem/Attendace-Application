@@ -12,7 +12,7 @@ class LeaveHistoryRepository {
       int employeeId = pref.getInt("employee_id") ?? 0;
 
       final apiUrl =
-          "http://62.171.184.216:9595/api/leave/getleavehistorybyemployeeid?CorporateId=$corporateId&employeeId=$employeeId";
+          "http://62.171.184.216:9595/api/employee/leave/getleavehistorybyemployeeid?CorporateId=$corporateId&employeeId=$employeeId";
 
       final headers = {
         'Content-Type': 'application/json', // Set the content type to JSON

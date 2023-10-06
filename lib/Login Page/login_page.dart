@@ -70,6 +70,8 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (employeeData.isNotEmpty) {
+        final cardNo = employeeData[0].cardNo; // Fetch cardNo from Employee model
+        _saveCardNoToSharedPreferences(cardNo);
         _loginAsEmployee();
       } else {
         _showErrorSnackbar(context, "User not found!");
@@ -106,6 +108,11 @@ class _LoginPageState extends State<LoginPage> {
             child: const EmpMainPage(), type: PageTransitionType.rightToLeft));
   }
 
+  void _saveCardNoToSharedPreferences(String cardNo) async {
+    // print("Card Number: $cardNo");
+    final sharedPrefEmp = await SharedPreferences.getInstance();
+    sharedPrefEmp.setString('cardNo', cardNo);
+  }
   void _loginAsAdmin() async {
 
     await _successScaffoldMessage(context,"Login Successful");

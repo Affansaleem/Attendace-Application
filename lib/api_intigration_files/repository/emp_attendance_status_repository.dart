@@ -16,14 +16,13 @@ class EmpAttendanceRepository {
     SharedPreferences pref = await SharedPreferences.getInstance();
     coorporateId = pref.getString("corporate_id")!;
     employeeId = pref.getInt("employee_id")!;
-    print(coorporateId);
-    print(employeeId);
+
   }
 
   Future<EmpAttendanceModel> getData() async {
     // Construct the apiUrl when you need it (inside a method).
     String apiUrl =
-        "http://62.171.184.216:9595/api/dashboard/attendance/employee?CorporateId=$coorporateId&employeeId=$employeeId";
+        "http://62.171.184.216:9595/api/employee/dashboard/attendance?CorporateId=$coorporateId&employeeId=$employeeId";
 
     final headers = {
       'Content-Type': 'application/json', // Set the content type to JSON
