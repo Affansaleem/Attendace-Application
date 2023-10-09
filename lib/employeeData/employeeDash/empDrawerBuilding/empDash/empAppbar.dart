@@ -26,6 +26,7 @@ class EmpAppBar extends StatelessWidget {
           final corporateId = sharedPrefEmp.getString('corporate_id')!;
           final username = sharedPrefEmp.getString('user_name')!;
           final password = sharedPrefEmp.getString('password')!;
+          final role = sharedPrefEmp.getString('role') ?? 'employee';
 
           return BlocProvider(
             create: (context) {
@@ -34,7 +35,8 @@ class EmpAppBar extends StatelessWidget {
               )..add(ApiLoadingEvent(
                   corporateId: corporateId,
                   username: username,
-                  password: password));
+                  password: password,
+                  role: role));
             },
             child: BlocBuilder<ApiIntigrationBloc, ApiIntigrationState>(
               builder: (context, state) {

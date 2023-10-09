@@ -478,6 +478,7 @@ class _EmpEditProfilePageState extends State<EmpEditProfilePage> {
         corporateId: retrievedCorporateId,
         username: retrievedUsername,
         password: retrievedPassword,
+        role: 'employee'
       ));
 
       if (employees.isNotEmpty) {
