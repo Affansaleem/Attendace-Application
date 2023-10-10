@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:project/Login%20Page/login_page.dart';
+import 'package:project/adminData/adminDash/adminDrawerPages/adminMap/adminGeofencing.dart';
 import 'package:project/bloc_internet/internet_bloc.dart';
 import 'package:project/bloc_internet/internet_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Login Page/login_bloc/loginbloc.dart';
 import '../adminDashBloc/admin_dash_bloc.dart';
 import '../adminDrawerPages/AdminReports_page/adminScreens/adminReports_page.dart';
-import '../adminDrawerPages/adminMap/adminMapdisplay.dart';
 import '../adminDrawerPages/adminProfile_page/adminProfilePage.dart';
 import 'admindDrawer.dart';
 import 'adminDraweritems.dart';
@@ -123,53 +123,53 @@ class _MainPageState extends State<AdminMainPage> {
           });
 
   Widget buildDrawer() => SafeArea(
-        child: AnimatedOpacity(
-          opacity: isDrawerOpen ? 1.0 : 0.0,
-          duration: Duration(milliseconds: 300),
-          child: Padding(
-            padding:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
-            child: Container(
-              height: MediaQuery.of(context).size.height / 1,
-              width: xoffset,
-              child: MyDrawer(
-                onSelectedItems: (selectedItem) {
-                  setState(() {
-                    item = selectedItem;
-                    closeDrawer();
-                  });
+    child: AnimatedOpacity(
+      opacity: isDrawerOpen ? 1.0 : 0.0,
+      duration: Duration(milliseconds: 300),
+      child: Padding(
+        padding:
+        EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
+        child: Container(
+          height: MediaQuery.of(context).size.height / 1,
+          width: xoffset,
+          child: MyDrawer(
+            onSelectedItems: (selectedItem) {
+              setState(() {
+                item = selectedItem;
+                closeDrawer();
+              });
 
-                  switch (item) {
-                    case DrawerItems.home:
-                      dashBloc.add(NavigateToHomeEvent());
-                      break;
+              switch (item) {
+                case DrawerItems.home:
+                  dashBloc.add(NavigateToHomeEvent());
+                  break;
 
-                    case DrawerItems.geofence:
-                      dashBloc.add(NavigateToGeofenceEvent());
-                      break;
+                case DrawerItems.geofence:
+                  dashBloc.add(NavigateToGeofenceEvent());
+                  break;
 
-                    case DrawerItems.reports:
-                      dashBloc.add(NavigateToReportsEvent());
-                      break;
+                case DrawerItems.reports:
+                  dashBloc.add(NavigateToReportsEvent());
+                  break;
 
-                    case DrawerItems.profile:
-                      dashBloc.add(NavigateToProfileEvent());
-                      break;
+                case DrawerItems.profile:
+                  dashBloc.add(NavigateToProfileEvent());
+                  break;
 
-                    case DrawerItems.logout:
-                      dashBloc.add(NavigateToLogoutEvent());
-                      break;
+                case DrawerItems.logout:
+                  dashBloc.add(NavigateToLogoutEvent());
+                  break;
 
-                    default:
-                      dashBloc.add(NavigateToHomeEvent());
-                      break;
-                  }
-                },
-              ),
-            ),
+                default:
+                  dashBloc.add(NavigateToHomeEvent());
+                  break;
+              }
+            },
           ),
         ),
-      );
+      ),
+    ),
+  );
 
   Widget buildPage() {
     return WillPopScope(
@@ -224,7 +224,7 @@ class _MainPageState extends State<AdminMainPage> {
         if (state is NavigateToProfileState) {
           return AdminProfilePage(openDrawer: openDrawer);
         } else if (state is NavigateToGeofenceState) {
-          return AdminMapDisplay(
+          return AdminGeofencing(
             openDrawer: openDrawer,
           );
         } else if (state is NavigateToHomeState) {
