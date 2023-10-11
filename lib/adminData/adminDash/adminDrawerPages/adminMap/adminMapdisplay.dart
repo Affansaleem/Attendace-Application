@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:lottie/lottie.dart';
@@ -10,16 +9,22 @@ import 'package:project/bloc_internet/internet_bloc.dart';
 import 'package:project/bloc_internet/internet_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../api_intigration_files/adminGeofenceApiFiles/admin_geofence_bloc.dart';
+import '../../../../api_intigration_files/adminGeofenceApiFiles/admin_geofence_event.dart';
+import '../../../../api_intigration_files/models/GetActiveEmployees_model.dart';
+import '../../../../api_intigration_files/models/adminGeofenceModel.dart';
+
 class AdminMapDisplay extends StatefulWidget {
-  const AdminMapDisplay({
-    Key? key,
-  }) : super(key: key);
+  final List<GetActiveEmpModel> selectedEmployees;
+
+  const AdminMapDisplay({Key? key, required this.selectedEmployees})
+      : super(key: key);
 
   @override
-  State<AdminMapDisplay> createState() => _MapDisplayState();
+  State<AdminMapDisplay> createState() => _AdminMapDisplayState();
 }
 
-class _MapDisplayState extends State<AdminMapDisplay> {
+class _AdminMapDisplayState extends State<AdminMapDisplay> {
   double? currentLat;
   double? currentLong;
   double? sendLat;
@@ -38,6 +43,33 @@ class _MapDisplayState extends State<AdminMapDisplay> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('latitude', lat);
     await prefs.setDouble('longitude', long);
+  }
+
+  Future<void> _submitGeofenceDataForAllEmployees() async {
+    final adminGeofenceBloc = BlocProvider.of<AdminGeoFenceBloc>(context);
+
+    // Replace this list with the actual list of employees you have
+    final List<GetActiveEmpModel> employees = widget.selectedEmployees;
+
+    for (final employee in employees) {
+      final geofenceModel = AdminGeoFenceModel(
+        empId: employee.empId ?? 0,
+        empName: employee.empName ?? '',
+        fatherName: "null",
+        pwd: "null",
+        emailAddress: "null",
+        phoneNo: 'null',
+        profilePic: '', // You may need to set a valid value here
+        lat: currentLat.toString(), // Replace with the actual latitude
+        lon: currentLong.toString(), // Replace with the actual longitude
+        radius: '10',
+      );
+
+      // Print the geofenceModel before sending it to the API
+      print("Sending geofenceModel: ${geofenceModel.toJson()}");
+
+      adminGeofenceBloc.add(SetGeoFenceEvent([geofenceModel]));
+    }
   }
 
   Future<void> checkLocationPermissionAndFetchLocation() async {
@@ -80,7 +112,7 @@ class _MapDisplayState extends State<AdminMapDisplay> {
       if (mounted) {
         setState(() {
           address =
-          "${placemarks[0].street!}, ${placemarks[4].street!} , ${placemarks[0].country!}";
+              "${placemarks[0].street!}, ${placemarks[4].street!} , ${placemarks[0].country!}";
         });
       }
     } else {}
@@ -102,6 +134,7 @@ class _MapDisplayState extends State<AdminMapDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final adminGeofenceBloc = BlocProvider.of<AdminGeoFenceBloc>(context);
     return BlocConsumer<InternetBloc, InternetStates>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -114,7 +147,7 @@ class _MapDisplayState extends State<AdminMapDisplay> {
                   title: const Center(
                     child: Padding(
                       padding:
-                      EdgeInsets.only(right: 55.0), // Add right padding
+                          EdgeInsets.only(right: 55.0), // Add right padding
                       child: Text(
                         "GEOFENCING",
                         style: TextStyle(color: Colors.white),
@@ -134,7 +167,9 @@ class _MapDisplayState extends State<AdminMapDisplay> {
                         setState(() {
                           sendLat = pickedData.latLong.latitude;
                           sendLong = pickedData.latLong.longitude;
+                          _submitGeofenceDataForAllEmployees();
                           saveLocationToSharedPreferences(sendLat!, sendLong!);
+
                         });
                         showSnackbar(context, "Cordinates Are Saved");
                       },
@@ -171,7 +206,7 @@ class _MapDisplayState extends State<AdminMapDisplay> {
                   title: const Center(
                     child: Padding(
                       padding:
-                      EdgeInsets.only(right: 55.0), // Add right padding
+                          EdgeInsets.only(right: 55.0), // Add right padding
                       child: Text(
                         "GEOFENCING",
                         style: TextStyle(color: Colors.white),

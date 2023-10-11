@@ -10,14 +10,14 @@ import '../../../../api_intigration_files/models/GetActiveEmployees_model.dart';
 import '../../../../api_intigration_files/repository/Branch_repository.dart';
 import '../../../../api_intigration_files/repository/Company_repository.dart';
 import '../../../../api_intigration_files/repository/Department_repository.dart';
-import 'SubmitAttendance.dart';
+import 'LeaveSubmissionPage.dart';
 
-class ManualMarkAttendance extends StatefulWidget {
+class EmployeeList extends StatefulWidget {
   @override
-  _ManualMarkAttendanceState createState() => _ManualMarkAttendanceState();
+  _EmployeeListState createState() => _EmployeeListState();
 }
 
-class _ManualMarkAttendanceState extends State<ManualMarkAttendance> {
+class _EmployeeListState extends State<EmployeeList> {
   String corporateId = '';
   List<GetActiveEmpModel> employees = [];
   List<GetActiveEmpModel> selectedEmployees = [];
@@ -79,7 +79,7 @@ class _ManualMarkAttendanceState extends State<ManualMarkAttendance> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) =>
-            SubmitAttendance(selectedEmployees: selectedEmployees),
+            LeaveSubmissionPage(selectedEmployees: selectedEmployees),
       ),
     );
   }

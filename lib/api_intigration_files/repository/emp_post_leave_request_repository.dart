@@ -30,7 +30,8 @@ class SubmissionRepository {
     if (response.statusCode == 200) {
       // Request was successful
       print("Response submitted");
-    } else {
+    }
+    else {
       // Request failed, log status code and response content
       print("Failed to fetch data from the API. Status code: ${response.statusCode}");
       print("Response content: ${response.body}");

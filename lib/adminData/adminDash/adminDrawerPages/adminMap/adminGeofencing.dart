@@ -295,28 +295,32 @@ class _AdminGeofencingState extends State<AdminGeofencing> {
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(top: 50),
-                child: ElevatedButton(
+                child:ElevatedButton(
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AdminMapDisplay()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AdminMapDisplay(selectedEmployees: selectedEmployees),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.blue,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 24),
+                      vertical: 12,
+                      horizontal: 24,
+                    ),
                   ),
                   child: const Text(
                     "Start Geofencing",
                     style: TextStyle(
-                      fontSize: 16, // Adjust the font size as needed
-                      fontWeight:
-                      FontWeight.bold, // Adjust the font weight as needed
-                      color: Colors.white, // Change text color as needed
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
+
               ),
             ),
             Column(

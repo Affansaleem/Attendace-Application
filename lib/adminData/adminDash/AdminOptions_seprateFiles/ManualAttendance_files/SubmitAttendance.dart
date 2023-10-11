@@ -44,70 +44,86 @@ class _SubmitAttendanceState extends State<SubmitAttendance> {
         ),
         body: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // Add Date Selection Field at the top
-              Row(
-                children: [
-                  const Text("Select Date: "),
-                  TextButton(
-                    onPressed: () => _selectDate(context),
-                    child: Text(
-                      "${selectedDate.toLocal()}".split(' ')[0],
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+              Card(
+                elevation: 4.0,
+                margin: const EdgeInsets.all(16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      const Text(
+                        'Select Date and Time:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      // Calendar for date selection
+                      ListTile(
+                        title: const Text('Select Date:'),
+                        trailing: Text(
+                          "${selectedDate.toLocal()}".split(' ')[0],
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        onTap: () => _selectDate(context),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildTimePicker(
+                        title: 'In Time',
+                        selectedTime: selectedInTime,
+                        onTimeSelected: (time) {
+                          setState(() {
+                            selectedInTime = time;
+                          });
+                        },
+                      ),
+                      _buildTimePicker(
+                        title: 'Out Time',
+                        selectedTime: selectedOutTime,
+                        onTimeSelected: (time) {
+                          setState(() {
+                            selectedOutTime = time;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                ],
-              ),
-              // Add In-Time and Out-Time Fields
-              _buildTimePicker(
-                title: 'In Time',
-                selectedTime: selectedInTime,
-                onTimeSelected: (time) {
-                  setState(() {
-                    selectedInTime = time;
-                  });
-                },
-              ),
-              _buildTimePicker(
-                title: 'Out Time',
-                selectedTime: selectedOutTime,
-                onTimeSelected: (time) {
-                  setState(() {
-                    selectedOutTime = time;
-                  });
-                },
-              ),
-              const SizedBox(height: 20), // Add some spacing
-
-              // Display selected employees with remarks in a table-like format
-              SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: DataTable(
-                  columns: [
-                    const DataColumn(label: Text('Emp Name')),
-                    const DataColumn(label: Text('Emp Code')),
-                    const DataColumn(label: Text('Remarks')),
-                  ],
-                  rows: widget.selectedEmployees.map((employee) {
-                    return DataRow(
-                      cells: [
-                        DataCell(Text(employee.empName ?? '')),
-                        DataCell(Text(employee.empCode ?? '')),
-                        DataCell(Text(employee.remarks ?? '')),
-                      ],
-                    );
-                  }).toList(),
                 ),
               ),
-
+              Container(
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: DataTable(
+                    headingRowColor: MaterialStatePropertyAll(Color(0xFFE26142)),
+                    columns: const [
+                      DataColumn(label: Text('ID',style: TextStyle(color:Colors.white),)),
+                      DataColumn(label: Text('Name',style: TextStyle(color:Colors.white),)),
+                      DataColumn(label: Text('Remarks',style: TextStyle(color:Colors.white),)),
+                    ],
+                    rows: widget.selectedEmployees.map((employee) {
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(employee.empCode ?? '')),
+                          DataCell(Text(employee.empName ?? '')),
+                          DataCell(Text(employee.remarks ?? '')),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
               const SizedBox(height: 20), // Add some spacing
-
-              // Add a button for submitting attendance for In Time
-              // Inside the onPressed callback for submitting attendance
               ElevatedButton(
                 onPressed: () {
                   final List<PunchData> requestDataList = [];

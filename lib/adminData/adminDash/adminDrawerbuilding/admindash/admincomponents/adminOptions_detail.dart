@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:project/adminData/adminDash/AdminOptions_seprateFiles/AdminReports_files/AdminReportsMainPage.dart';
 import 'package:project/adminData/adminDash/AdminOptions_seprateFiles/ManualAttendance_files/ManualMarkAttendance.dart';
 import '../adminConstants/adminconstants.dart';
 import 'adminOptions_card.dart';
@@ -40,7 +41,7 @@ class AdminStorageDetails extends StatelessWidget {
                 context,
                 CupertinoPageRoute(
                   builder: (context) {
-                    return  ManualMarkAttendance();
+                    return ManualMarkAttendance();
                   },
                 ),
               );
@@ -56,9 +57,16 @@ class AdminStorageDetails extends StatelessWidget {
             title: "Leaves",
           ),
           const SizedBox(height: 5),
-          const AdminStorageInfoCard(
-            svgSrc: "assets/icons/report.png",
-            title: "Report",
+          GestureDetector(
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminReportsMainPage(),
+                )),
+            child: const AdminStorageInfoCard(
+              svgSrc: "assets/icons/report.png",
+              title: "Report",
+            ),
           ),
           const SizedBox(height: 5),
           const AdminStorageInfoCard(
